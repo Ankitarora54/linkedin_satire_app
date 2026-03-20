@@ -9,7 +9,7 @@ Rules:
 - Add humor through exaggeration and seriousness.
 - Do not use the exact words from the input, but capture the essence in a professional and funny way.
 - Keep it clean and suitable for LinkedIn.
-- Keep it short in 2-3 lines with a strong hook and clear lessons.
+- Keep it short in 1-2 lines with a strong hook and clear lessons.
 - Include:
   1. Strong opening hook
   2. Story (reframed professionally)
@@ -22,7 +22,6 @@ Structure:
 Hook
 Story
 Lessons
-CTA
 Hashtags
 
 Make the post feel authentic but unintentionally funny.

@@ -1,3 +1,12 @@
+/* 🌈 Modern layered background */
+.stApp {
+    background:
+        radial-gradient(circle at 20% 20%, rgba(115, 156, 243, 0.08), transparent 40%),
+        radial-gradient(circle at 80% 30%, rgba(119, 207, 241, 0.06), transparent 40%),
+        linear-gradient(135deg, #fbf8fc 0%, #c7e6f1 100%);
+    min-height: 100vh;
+}
+
 /* ---------- GLOBAL ---------- */
 body {
     background: linear-gradient(135deg, #f3f6f9, #e9eef3);
@@ -111,4 +120,22 @@ h1 {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/*---------- INPUT AREA ----------*/
+.input-box {
+    padding: 20px;
+    background: white;
+    border-radius: 14px;
+    border: 1px solid #e6ecf0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/*---------- OUTPUT AREA ----------*/
+.output-box {
+    padding: 24px;
+    background: white;
+    border-radius: 14px;
+    border: 1px solid #e6ecf0;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08); 
 }
