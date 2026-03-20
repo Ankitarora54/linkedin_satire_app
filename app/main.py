@@ -92,6 +92,7 @@ col1, col2 = st.columns([1,2.5])
 with col1:
     #st.markdown("<div class='input-box'>", unsafe_allow_html=True)
     st.markdown("### Your Reality")
+    st.markdown("Write your everyday moments in the textbox below and hit translate. No need to be fancy, just the raw truth. The cringier, the better!")
     user_input = st.text_area("", height=150, placeholder="I Just Took a Shit...Feeling So Good...")
 
     tone = st.selectbox("Tone", [
