@@ -67,7 +67,7 @@ col1, col2 = st.columns([1, 2])
 if mode == "Reality → LinkedIn":
 
     with col1:
-
+        loader_placeholder = st.empty()
         st.markdown("<h6>Your Reality</h6>", unsafe_allow_html=True)
         user_input = st.text_area("Write any reality you'd like to transform. plain simple language. The funnier the better!!!",height=250)
 
@@ -83,7 +83,19 @@ if mode == "Reality → LinkedIn":
         if st.button("Translate →"):
             if user_input.strip():
                 base_prompt = load_prompt("FORWARD")
-
+                st.session_state.loading = True
+                st.session_state.output = ""
+                loader_html="""
+                    <div class="loader">
+                        <div class="dot-loader">
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                        </div>
+                        <div class="loader-text">Translating your thoughts into corporate wisdom...</div>
+                    </div>
+                    """
+                loader_placeholder.markdown(loader_html, unsafe_allow_html=True)
                 prompt = base_prompt.format(
                     input=user_input,
                     tone=tone,
@@ -98,27 +110,42 @@ if mode == "Reality → LinkedIn":
                 )
 
                 st.session_state.output = response.choices[0].message.content
+                st.session_state.loading = False
+                loader_placeholder.empty()
 
     with col2:
 
         if st.session_state.output:
             st.markdown("<h6>LinkedIn Post</h6>", unsafe_allow_html=True)
             st.markdown(f"<div class='output-box'>{st.session_state.output}</div>", unsafe_allow_html=True)
+            output_placeholder = st.empty()
 
 # ---------- REVERSE ----------
 else:
     col1, col2 = st.columns([1, 1])
     with col1:
-        
+        loader_placeholder = st.empty()
         user_input = st.text_area("**Paste LinkedIn Post**", height=300)
         st.markdown("Paste any LinkedIn post above. It will decode the Author's true emotion behind the post!!!", unsafe_allow_html=True)
 
         if st.button("Decode →"):
             if user_input.strip():
                 base_prompt = load_prompt("REVERSE")
+                st.session_state.loading = True
+                st.session_state.output = ""
+                loader_html="""
+                    <div class="loader">
+                        <div class="dot-loader">
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                        </div>
+                        <div class="loader-text">Translating corporate wisdom into reality</div>
+                    </div>
+                    """
+                loader_placeholder.markdown(loader_html, unsafe_allow_html=True)
 
                 prompt = base_prompt.format(input=user_input)
-
                 response = client.chat.completions.create(
                     model="gpt-5-mini", #"gpt-4o-mini",
                     messages=[{"role": "user", "content": prompt}]
@@ -126,11 +153,16 @@ else:
                     #temperature=0.9
                 )
 
-                st.session_state.output = response.choices[0].message.content     
+                st.session_state.output = response.choices[0].message.content
+                st.session_state.loading = False
+                loader_placeholder.empty()
+
     with col2:
         if st.session_state.output:
-            st.markdown("<h6>Decoded Reality</h6>", unsafe_allow_html=True)
+            st.markdown("<h6>Decoded Real Emotion</h6>", unsafe_allow_html=True)
+            output_placeholder = st.empty()
             st.markdown(f"<div class='output-box'>{st.session_state.output}</div>", unsafe_allow_html=True)
+
 
 # ---------- FOOTER ----------
 st.markdown("---")
