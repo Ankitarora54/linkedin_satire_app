@@ -15,7 +15,7 @@ import os
 load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-st.set_page_config(page_title="LinkedIn Satire Generator", layout="centered")
+st.set_page_config(page_title="LinkedIn Satire Generator", layout="wide")
 # ---------- LOAD EXTERNAL CSS ----------
 def load_css():
     with open("styles.css") as f:
@@ -23,140 +23,114 @@ def load_css():
 
 load_css()
 
-# st.markdown(
-#     """<h1 style='text-align: center;'>LinkedIn Satire Generator</h1>
-#     "<p style='text-align:center;color:gray;'>Convert reality into corporate storytelling</p>
-# """,
-#     unsafe_allow_html=True
-# )
+# ---------- LOAD PROMPTS FROM FILE ----------
+def load_prompt(template_name):
+    with open("prompts.txt", "r") as f:
+        content = f.read()
+
+    sections = content.split("###")
+
+    for section in sections:
+        if section.strip().startswith(template_name):
+            return section.replace(template_name, "").strip()
+
+    return ""
+
 
 st.markdown(
-    "<h1 style='text-align: center;'>LinkedIn Satire Generator</h1>",
+    "<h2 style='text-align: center;'>LinkedIn Satire Generator → Decoder</h2>",
     unsafe_allow_html=True
 )
 
-#st.title("LinkedIn Satire AI Generator")
-# # ---------- INPUT ----------
-# user_input = st.text_area("Enter your moment:")
+# ---------- MODE ----------
+mode = st.radio("",["Reality → LinkedIn", "LinkedIn → Reality"],index=1,horizontal=True)
 
-# tone = st.selectbox("Tone", [
-#     "Corporate Influencer",
-#     "Humble Brag",
-#     "Spiritual Guru",
-#     "Startup Founder"
-# ])
 
-# spice = st.slider("Cringe Level", 1, 5, 3)
+# ---------- MODE SWITCHING SESSION STATE ----------
+if "prev_mode" not in st.session_state:
+    st.session_state.prev_mode = mode
 
-# ---------- PROMPT ----------
-def build_prompt(user_input, tone, spice, exaggeration=1):
-    return f"""
-You are an AI that converts any user input into a humorous, exaggerated LinkedIn-style post.
-
-Rules:
-- NEVER use crude, explicit, or inappropriate words from the input.
-- Abstract the situation into a professional or personal growth narrative.
-- Use corporate buzzwords, leadership tone, and reflective storytelling.
-- Add humor through exaggeration and seriousness.
-- Keep it clean and suitable for LinkedIn.
-- Do not use the exact words from the input, but capture the essence in a professional and funny way.
-- Keep it short in 1-2 lines with a strong hook and clear lessons.
-- Include:
-  1. Strong opening hook
-  2. Story (reframed professionally)
-  3. 4–6 relevant hashtags
-- Increase exaggeration level: {exaggeration}
-
-Tone: {tone}
-Cringe Level: {spice}/5
-
-Structure:
-Hook
-Story
-Lessons
-Hashtags
-
-Make the post feel authentic but unintentionally funny.
-
-Input: {user_input}
-"""
+if st.session_state.prev_mode != mode:
+    st.session_state.output = ""
+    st.session_state.prev_mode = mode
 
 # ---------- SESSION ----------
 if "output" not in st.session_state:
     st.session_state.output = ""
     st.session_state.exaggeration = 1
 
-# ---------- TWO COLUMN LAYOUT (GOOGLE TRANSLATE STYLE) ----------
-col1, col2 = st.columns([1,2.5])
-
-with col1:
-    #st.markdown("<div class='input-box'>", unsafe_allow_html=True)
-    st.markdown("### Your Reality")
-    st.markdown("Write your everyday moments in the textbox below and hit translate. No need to be fancy, just the raw truth. The cringier, the better!")
-    user_input = st.text_area("", height=150, placeholder="I Just Took a Shit...Feeling So Good...")
-
-    tone = st.selectbox("Tone", [
-        "Corporate Influencer",
-        "Humble Brag",
-        "Spiritual Guru",
-        "Startup Founder"
-    ])
-
-    spice = st.slider("Cringe Level", 1, 5, 3)
+# ---------- LAYOUT ----------
+col1, col2 = st.columns([1, 2])
 
 
-    if st.button("Translate →"):
-        if user_input.strip():
-            st.session_state.exaggeration = 1
-            prompt = build_prompt(user_input, tone, spice, 1)
+# ---------- FORWARD ----------
+if mode == "Reality → LinkedIn":
 
-            response = client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[{"role": "user", "content": prompt}],
-                temperature=0.9
-            )
+    with col1:
 
-            st.session_state.output = response.choices[0].message.content
-    #st.markdown("</div>", unsafe_allow_html=True)
-with col2:
-    #st.markdown("<div class='output-box'>", unsafe_allow_html=True)
-    st.markdown("### LinkedIn Version")
+        st.markdown("<h6>Your Reality</h6>", unsafe_allow_html=True)
+        user_input = st.text_area("Write any reality you'd like to transform. plain simple language. The funnier the better!!!",height=250)
 
-    if st.session_state.output:
-        st.markdown(f"""
-        <div class="card">
-            <div class="name">LinkedIn Satirist • AI Enthusiast</div>
-            <div class="meta">Just now • </div>
-            <div class="post">{st.session_state.output.replace(chr(10), '<br>')}</div>
-        </div>
-        """, unsafe_allow_html=True)
+        tone = st.selectbox("Tone", [
+            "Corporate Influencer",
+            "Humble Brag",
+            "Spiritual Guru",
+            "Startup Founder"
+        ])
 
-        # Cringe score
-        score = min(100, 40 + len(st.session_state.output.split()) // 3)
-        st.markdown(f"<div class='score'>🔥 Cringe Score: {score}/100</div>", unsafe_allow_html=True)
-        st.progress(score / 100)
+        spice = st.slider("Cringe Level", 1, 5, 3)
 
-        # Buttons
-        colA, colB = st.columns(2)
+        if st.button("Translate →"):
+            if user_input.strip():
+                base_prompt = load_prompt("FORWARD")
 
-        with colA:
-            if st.button("🔥 Make it Worse"):
-                st.session_state.exaggeration += 1
-
-                prompt = build_prompt(user_input, tone, spice, st.session_state.exaggeration)
+                prompt = base_prompt.format(
+                    input=user_input,
+                    tone=tone,
+                    spice=spice,
+                    exaggeration=1
+                )
 
                 response = client.chat.completions.create(
                     model="gpt-4o-mini",
                     messages=[{"role": "user", "content": prompt}],
-                    temperature=1.0
+                    temperature=0.9
                 )
 
                 st.session_state.output = response.choices[0].message.content
 
-        #with colB:
-            #st.code(st.session_state.output)
-    #st.markdown("</div>", unsafe_allow_html=True)
-    
+    with col2:
+
+        if st.session_state.output:
+            st.markdown("<h6>LinkedIn Post</h6>", unsafe_allow_html=True)
+            st.markdown(f"<div class='output-box'>{st.session_state.output}</div>", unsafe_allow_html=True)
+
+# ---------- REVERSE ----------
+else:
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        
+        user_input = st.text_area("**Paste LinkedIn Post**", height=300)
+        st.markdown("Paste any LinkedIn post above. It will decode the Author's true emotion behind the post!!!", unsafe_allow_html=True)
+
+        if st.button("Decode →"):
+            if user_input.strip():
+                base_prompt = load_prompt("REVERSE")
+
+                prompt = base_prompt.format(input=user_input)
+
+                response = client.chat.completions.create(
+                    model="gpt-4o-mini",
+                    messages=[{"role": "user", "content": prompt}],
+                    temperature=0.9
+                )
+
+                st.session_state.output = response.choices[0].message.content     
+    with col2:
+        if st.session_state.output:
+            st.markdown("<h6>Decoded Reality</h6>", unsafe_allow_html=True)
+            st.markdown(f"<div class='output-box'>{st.session_state.output}</div>", unsafe_allow_html=True)
+
 # ---------- FOOTER ----------
 st.markdown("---")
-st.caption("Translate your life into leadership ")
+st.caption("Prompt-driven AI app by [Ankit Arora] • Powered by OpenAI's GPT-5.1")
