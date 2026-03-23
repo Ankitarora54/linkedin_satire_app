@@ -92,9 +92,9 @@ if mode == "Reality → LinkedIn":
                 )
 
                 response = client.chat.completions.create(
-                    model="gpt-4o-mini",
-                    messages=[{"role": "user", "content": prompt}],
-                    temperature=0.9
+                    model="gpt-5-mini", #"gpt-4o-mini",
+                    messages=[{"role": "user", "content": prompt}]
+                    #temperature=0.9
                 )
 
                 st.session_state.output = response.choices[0].message.content
@@ -120,9 +120,10 @@ else:
                 prompt = base_prompt.format(input=user_input)
 
                 response = client.chat.completions.create(
-                    model="gpt-4o-mini",
-                    messages=[{"role": "user", "content": prompt}],
-                    temperature=0.9
+                    model="gpt-5-mini", #"gpt-4o-mini",
+                    messages=[{"role": "user", "content": prompt}]
+                    
+                    #temperature=0.9
                 )
 
                 st.session_state.output = response.choices[0].message.content     
